@@ -1,0 +1,15 @@
+
+.game-board {
+    display: grid;
+    height: 100svh;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    align-content: center;
+    justify-content: center;
+}
+
+.game-tile {
+    border: solid black 1px;
+    width: 100px;
+    height: 100px;
+}
