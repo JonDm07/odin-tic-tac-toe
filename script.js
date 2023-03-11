@@ -19,13 +19,12 @@ const gameBoard = (() => {
                     player1.play(x, y)
                     box.textContent = "X"
                     turnDisplay.render()
+                    
                 } else if (gameController.turn % 2 === 0 && gameBoard.gameBoardArr[x][y] !== "X" && gameBoard.gameBoardArr[x][y] !== "O" && gameController.winner === undefined){
                     player2.play(x, y)
                     box.textContent = "O"
                     turnDisplay.render()
                 }
-
-
             })  
         })
     }
@@ -198,7 +197,11 @@ const turnDisplay = (function() {
 
 
 
-function player(name, symbol) {
+function player(symbol) {
+
+    let x;
+    let y;
+
     function play(x, y) {
         if (gameBoard.gameBoardArr[x][y] !== "O" && gameBoard.gameBoardArr[x][y] !== "X") {
             gameBoard.gameBoardArr[x][y] = symbol
@@ -210,10 +213,14 @@ function player(name, symbol) {
         }
     }
 
-    return {name, symbol, play}
+    return {symbol, x, y, play}
 }
 
-const player1 = player("J", "X")
-const player2 = player("H", "O")
+const player1 = Object.create(player("X"))
+const player2 = Object.create(player("O"))
 
+player2.getXandY = function() {
+    this.x = Math.floor(Math.random() * 3)
+    this.y = Math.floor(Math.random() * 3)
+}
 
