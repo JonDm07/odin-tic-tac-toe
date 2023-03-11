@@ -4,28 +4,66 @@ const gameBoard = (() => {
         ["C4","C5","C6"],
         ["C7","C8","C9"]
     ]
+    
+    const boxes = Array.from(document.querySelectorAll(".box"))
+
+    const clickListener = function() {
+
+        boxes.forEach(box => {
+            box.addEventListener("click", () => {
+                
+                let x = box.getAttribute("data-x")
+                let y = box.getAttribute("data-y")
+
+                if(gameController.turn % 2 === 1 && gameBoard.gameBoardArr[x][y] !== "X" && gameBoard.gameBoardArr[x][y] !== "O" && gameController.winner === undefined) {
+                    player1.play(x, y)
+                    box.textContent = "X"
+                    turnDisplay.render()
+                } else if (gameController.turn % 2 === 0 && gameBoard.gameBoardArr[x][y] !== "X" && gameBoard.gameBoardArr[x][y] !== "O" && gameController.winner === undefined){
+                    player2.play(x, y)
+                    box.textContent = "O"
+                    turnDisplay.render()
+                }
+
+
+            })  
+        })
+    }
+
+    const resetBoard = function() {
+        const resetButton = document.querySelector(".reset")
+
+        resetButton.addEventListener("click", () => {
+            gameBoard.gameBoardArr = [
+                ["C1","C2","C3"],
+                ["C4","C5","C6"],
+                ["C7","C8","C9"]
+            ]
+
+            gameController.turn = 1
+            gameController.winner = undefined
+
+            boxes.forEach(box => {
+                box.textContent = ""
+            })
+
+            turnDisplay.render() 
+
+        })
+    }
+
+    clickListener()
+    resetBoard()
 
     return {gameBoardArr}
 
 })();
 
-function player(name) {
-    function play(x, y, symbol) {
-        if (gameBoard.gameBoardArr[x][y] !== "O" && gameBoard.gameBoardArr[x][y] !== "X") {
-            gameBoard.gameBoardArr[x][y] = symbol
-            evaluateRow()
-            evaluateColumn()
-        }
-    }
-
-    return {name, play}
-}
-
-const player1 = player("J")
-
-
-
 const gameController = (() => {
+
+    let turn = 1
+    let winner;
+
     const evaluateRow = function() {
         for(let i = 0; i < 3; i++) {
 
@@ -40,8 +78,12 @@ const gameController = (() => {
                 }                
             }
 
-            if(arrX.length === 3 || arrO.length === 3) {
-                alert(`WTF it happened X:${arrX.length} O:${arrO.length}`)
+            if(arrX.length === 3) {
+                alert("X won, row")
+                gameController.winner = "X"
+            } else if ( arrO.length === 3) {
+                alert("O won, row")
+                gameController.winner = "O"
             }
         }
     }
@@ -60,34 +102,118 @@ const gameController = (() => {
                 }                
             }
 
-            if(arrX.length === 3 || arrO.length === 3) {
-                alert(`WTF it happened X:${arrX.length} O:${arrO.length}`)
+            if(arrX.length === 3) {
+                alert("X won, column")
+                gameController.winner = "X"
+            } else if ( arrO.length === 3) {
+                alert("O won, column")
+                gameController.winner = "O"
+            }
+        }
+    }
+
+    const evaluateDiagonal = function() {
+        let centerSymbol = gameBoard.gameBoardArr[1][1]      
+
+            let arrX = []
+            let arrO = []
+
+            if (gameBoard.gameBoardArr[2][0] === centerSymbol) {
+                if(centerSymbol === "X") {
+                    arrX.push(gameBoard.gameBoardArr[2][0])
+                } else {
+                    arrO.push(gameBoard.gameBoardArr[2][0])
+                }
+            }
+            
+            if(gameBoard.gameBoardArr[0][2] === centerSymbol){
+                if(centerSymbol === "X") {
+                    arrX.push(gameBoard.gameBoardArr[0][2])
+                } else {
+                    arrO.push(gameBoard.gameBoardArr[0][2])
+                }
+            }
+            
+            let arrXTwo = []
+            let arrOTwo = []
+
+            if (gameBoard.gameBoardArr[0][0] === centerSymbol) {
+                if(centerSymbol === "X") {
+                    arrXTwo.push(gameBoard.gameBoardArr[2][0])
+                } else {
+                    arrOTwo.push(gameBoard.gameBoardArr[2][0])
+                }
+            }
+            
+            if(gameBoard.gameBoardArr[2][2] === centerSymbol){
+                if(centerSymbol === "X") {
+                    arrXTwo.push(gameBoard.gameBoardArr[0][2])
+                } else {
+                    arrOTwo.push(gameBoard.gameBoardArr[0][2])
+                }
             }
 
-            console.log(arrX)
-            console.log(arrO)
-            console.log(gameBoard.gameBoardArr)
-        }
+            if (arrX.length === 2) {
+                alert("X won, diagonal")
+                gameController.winner = "X"
+            } else if (arrO.length === 2) {
+                alert("O won, diagonal")
+                gameController.winner = "O"
+            } else if (arrXTwo.length === 2) {
+                alert("X won, diagonal")
+                gameController.winner = "X"
+            } else if (arrOTwo.length === 2) {
+                alert("O won, diagonal")
+                gameController.winner = "O"
+            }
+
 
     }
 
-/*     const play1 = (x, y) => {
-        if (gameBoard.gameBoardArr[x][y] !== "O" && gameBoard.gameBoardArr[x][y] !== "X") {
-            gameBoard.gameBoardArr[x][y] = "X"
-            evaluateRow()
-            evaluateColumn()
+    const evaluateTie = function() {
+        if(gameController.turn === 10 && gameController.winner === undefined) {
+            alert("Tie")
         }
-    }
-    const play2 = (x, y) => {
-        if (gameBoard.gameBoardArr[x][y] !== "O" && gameBoard.gameBoardArr[x][y] !== "X") {
-            gameBoard.gameBoardArr[x][y] = "O"
-            evaluateRow()
-            evaluateColumn()
-        }
-    } */
+    }   
 
-    return {evaluateRow, evaluateColumn, play1, play2}
+    return {evaluateRow, evaluateColumn, evaluateDiagonal, evaluateTie, turn, winner}
 
 })();
+
+const turnDisplay = (function() {
+    const turnDisplay = document.querySelector(".turn-display")
+    const render = function() {
+        if(gameController.turn % 2 === 1) {
+            turnDisplay.textContent = `Turn: X  ${gameController.turn}`
+        } else {
+            turnDisplay.textContent = `Turn: O  ${gameController.turn}`
+        }
+    }
+
+    
+
+    return {render}
+
+})();
+
+
+
+function player(name, symbol) {
+    function play(x, y) {
+        if (gameBoard.gameBoardArr[x][y] !== "O" && gameBoard.gameBoardArr[x][y] !== "X") {
+            gameBoard.gameBoardArr[x][y] = symbol
+            gameController.evaluateRow()
+            gameController.evaluateColumn()
+            gameController.evaluateDiagonal()
+            gameController.turn++
+            gameController.evaluateTie()
+        }
+    }
+
+    return {name, symbol, play}
+}
+
+const player1 = player("J", "X")
+const player2 = player("H", "O")
 
 

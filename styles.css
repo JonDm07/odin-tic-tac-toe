@@ -8,8 +8,9 @@
     justify-content: center;
 }
 
-.game-tile {
+.game-board > .box {
     border: solid black 1px;
     width: 100px;
     height: 100px;
+    text-align: center;
 }
