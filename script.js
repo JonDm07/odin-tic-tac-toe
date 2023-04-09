@@ -1,226 +1,160 @@
 const gameBoard = (() => {
     let gameBoardArr = [
-        ["C1","C2","C3"],
-        ["C4","C5","C6"],
-        ["C7","C8","C9"]
+        ["X","X","C"], 
+        ["O","O","C"],  
+        ["X","C","C"]   
     ]
+        
     
-    const boxes = Array.from(document.querySelectorAll(".box"))
-
-    const clickListener = function() {
-
-        boxes.forEach(box => {
-            box.addEventListener("click", () => {
-                
-                let x = box.getAttribute("data-x")
-                let y = box.getAttribute("data-y")
-
-                if(gameController.turn % 2 === 1 && gameBoard.gameBoardArr[x][y] !== "X" && gameBoard.gameBoardArr[x][y] !== "O" && gameController.winner === undefined) {
-                    player1.play(x, y)
-                    box.textContent = "X"
-                    turnDisplay.render()
-                    
-                } else if (gameController.turn % 2 === 0 && gameBoard.gameBoardArr[x][y] !== "X" && gameBoard.gameBoardArr[x][y] !== "O" && gameController.winner === undefined){
-                    player2.play(x, y)
-                    box.textContent = "O"
-                    turnDisplay.render()
-                }
-            })  
-        })
-    }
 
     const resetBoard = function() {
-        const resetButton = document.querySelector(".reset")
 
-        resetButton.addEventListener("click", () => {
             gameBoard.gameBoardArr = [
-                ["C1","C2","C3"],
-                ["C4","C5","C6"],
-                ["C7","C8","C9"]
+                ["C","C","C"],
+                ["C","C","C"],
+                ["C","C","C"]
             ]
-
-            gameController.turn = 1
-            gameController.winner = undefined
-
-            boxes.forEach(box => {
-                box.textContent = ""
-            })
-
-            turnDisplay.render() 
-
-        })
     }
 
-    clickListener()
-    resetBoard()
 
-    return {gameBoardArr}
+    return {gameBoardArr, resetBoard}
 
 })();
-
-const gameController = (() => {
-
-    let turn = 1
-    let winner;
-
-    const evaluateRow = function() {
-        for(let i = 0; i < 3; i++) {
-
-            let arrX = []
-            let arrO = []
-
-            for(let j = 0; j < 3; j++) {
-                if(gameBoard.gameBoardArr[i][j] === "X") {
-                    arrX.push(gameBoard.gameBoardArr[i][j])
-                } else if (gameBoard.gameBoardArr[i][j] === "O") {
-                    arrO.push(gameBoard.gameBoardArr[i][j])
-                }                
-            }
-
-            if(arrX.length === 3) {
-                alert("X won, row")
-                gameController.winner = "X"
-            } else if ( arrO.length === 3) {
-                alert("O won, row")
-                gameController.winner = "O"
-            }
-        }
-    }
-
-    const evaluateColumn = function() {
-        for(let i = 0; i < 3; i++) {
-
-            let arrX = []
-            let arrO = []
-
-            for(let j = 0; j < 3; j++) {
-                if(gameBoard.gameBoardArr[j][i] === "X") {
-                    arrX.push(gameBoard.gameBoardArr[j][i])
-                } else if (gameBoard.gameBoardArr[j][i] === "O") {
-                    arrO.push(gameBoard.gameBoardArr[j][i])
-                }                
-            }
-
-            if(arrX.length === 3) {
-                alert("X won, column")
-                gameController.winner = "X"
-            } else if ( arrO.length === 3) {
-                alert("O won, column")
-                gameController.winner = "O"
-            }
-        }
-    }
-
-    const evaluateDiagonal = function() {
-        let centerSymbol = gameBoard.gameBoardArr[1][1]      
-
-            let arrX = []
-            let arrO = []
-
-            if (gameBoard.gameBoardArr[2][0] === centerSymbol) {
-                if(centerSymbol === "X") {
-                    arrX.push(gameBoard.gameBoardArr[2][0])
-                } else {
-                    arrO.push(gameBoard.gameBoardArr[2][0])
-                }
-            }
-            
-            if(gameBoard.gameBoardArr[0][2] === centerSymbol){
-                if(centerSymbol === "X") {
-                    arrX.push(gameBoard.gameBoardArr[0][2])
-                } else {
-                    arrO.push(gameBoard.gameBoardArr[0][2])
-                }
-            }
-            
-            let arrXTwo = []
-            let arrOTwo = []
-
-            if (gameBoard.gameBoardArr[0][0] === centerSymbol) {
-                if(centerSymbol === "X") {
-                    arrXTwo.push(gameBoard.gameBoardArr[2][0])
-                } else {
-                    arrOTwo.push(gameBoard.gameBoardArr[2][0])
-                }
-            }
-            
-            if(gameBoard.gameBoardArr[2][2] === centerSymbol){
-                if(centerSymbol === "X") {
-                    arrXTwo.push(gameBoard.gameBoardArr[0][2])
-                } else {
-                    arrOTwo.push(gameBoard.gameBoardArr[0][2])
-                }
-            }
-
-            if (arrX.length === 2) {
-                alert("X won, diagonal")
-                gameController.winner = "X"
-            } else if (arrO.length === 2) {
-                alert("O won, diagonal")
-                gameController.winner = "O"
-            } else if (arrXTwo.length === 2) {
-                alert("X won, diagonal")
-                gameController.winner = "X"
-            } else if (arrOTwo.length === 2) {
-                alert("O won, diagonal")
-                gameController.winner = "O"
-            }
-
-
-    }
-
-    const evaluateTie = function() {
-        if(gameController.turn === 10 && gameController.winner === undefined) {
-            alert("Tie")
-        }
-    }   
-
-    return {evaluateRow, evaluateColumn, evaluateDiagonal, evaluateTie, turn, winner}
-
-})();
-
-const turnDisplay = (function() {
-    const turnDisplay = document.querySelector(".turn-display")
-    const render = function() {
-        if(gameController.turn % 2 === 1) {
-            turnDisplay.textContent = `Turn: X  ${gameController.turn}`
-        } else {
-            turnDisplay.textContent = `Turn: O  ${gameController.turn}`
-        }
-    }
-
-    
-
-    return {render}
-
-})();
-
-
 
 function player(symbol) {
 
-    let x;
-    let y;
-
     function play(x, y) {
         if (gameBoard.gameBoardArr[x][y] !== "O" && gameBoard.gameBoardArr[x][y] !== "X") {
-            gameBoard.gameBoardArr[x][y] = symbol
-            gameController.evaluateRow()
-            gameController.evaluateColumn()
-            gameController.evaluateDiagonal()
-            gameController.turn++
-            gameController.evaluateTie()
+            gameBoard.gameBoardArr[x][y] = symbol 
         }
+
+        console.log(gameBoard.gameBoardArr)
+    }  
+    return {symbol, play}
+}
+
+const algorithm = (function() {
+
+    const humanMark = "O"
+    const aiMark ="X"
+
+    const checkIfThereIsWinner = function(currentGameBoardState, mark) {
+        let winner;
+
+        if(currentGameBoardState[1][1] === mark && currentGameBoardState[2][0] === mark &&  currentGameBoardState[0][2] === mark) {
+            winner = mark
+        } else if (currentGameBoardState[1][1] === mark && currentGameBoardState[0][0] === mark &&  currentGameBoardState[2][2] === mark) {
+            winner = mark
+        }
+
+        (function loopThroughBoard(mark) {
+            
+            let currentRowOrColumn = []
+
+            for(let i = 0; i < 3; i++) {
+
+                currentRowOrColumn = []
+
+                for(let j = 0; j < 3; j++) {
+                    if(currentGameBoardState[i][j] === mark) {
+                        currentRowOrColumn.push(currentGameBoardState[i][j])
+                    }
+                }
+
+                if(currentRowOrColumn.length === 3) {
+                    winner = mark
+                    break
+                }
+
+                currentRowOrColumn = []
+
+                for (let l = 0; l < 3; l++) {
+                    if(currentGameBoardState[l][i] === mark) {
+                        currentRowOrColumn.push(currentGameBoardState[l][i])
+                    }
+                }
+
+                if(currentRowOrColumn.length === 3) {
+                    winner = mark
+                    break
+                }
+            }
+        })(mark);
+
+        return winner
+        
     }
 
-    return {symbol, x, y, play}
-}
+    const findEmptyCells = function(currentGameBoardState) {
+        let emptyCellsArray = []
+        for(let i = 0; i < 3; i++){
+            for(let j = 0; j <3; j++) {
+                if(currentGameBoardState[i][j] === "C") {
+                    let emptyCell = {
+                        row: i,
+                        column: j,
+                        score: undefined
+                    }
 
-const player1 = Object.create(player("X"))
-const player2 = Object.create(player("O"))
+                    emptyCellsArray.push(emptyCell)
+                }          
+            }
+        }
 
-player2.getXandY = function() {
-    this.x = Math.floor(Math.random() * 3)
-    this.y = Math.floor(Math.random() * 3)
-}
+        return emptyCellsArray
+    }
 
+
+    const minimax = (currentGameBoardState, maximizingPlayer) => {
+        let mark;
+
+        if(maximizingPlayer) {
+            mark = "X"
+        } else {
+            mark = "O"
+        }
+        
+        let emptyCellsArray = findEmptyCells(currentGameBoardState)
+
+        
+
+        let humanCheck = checkIfThereIsWinner(currentGameBoardState, humanMark)
+        let aiCheck = checkIfThereIsWinner(currentGameBoardState, aiMark)
+
+        if(humanCheck !== undefined || aiCheck !== undefined || emptyCellsArray.length === 0) {
+            if(humanCheck) {
+                return -1
+            } else if(aiCheck) {
+                return 1 
+            } else {
+                return 0
+            }
+        } else {
+            let score = []
+            if(maximizingPlayer) {
+                for(let i = 0; i < emptyCellsArray.length; i++) {
+                    let newGameBoard = JSON.parse(JSON.stringify(currentGameBoardState))
+                    newGameBoard[emptyCellsArray[i].row][emptyCellsArray[i].column] = mark
+                    score.push(minimax(newGameBoard, false))
+                    
+
+                }
+                return Math.max.apply(Math, score)        
+            } else{
+                for(let i = 0; i < emptyCellsArray.length; i++) {
+                    let newGameBoard = JSON.parse(JSON.stringify(currentGameBoardState))
+                    newGameBoard[emptyCellsArray[i].row][emptyCellsArray[i].column] = mark
+                    score.push(minimax(newGameBoard, true))
+                    
+
+                }
+                return score
+            }
+        }        
+    }
+
+    return {minimax}
+
+})()
+
+console.log(algorithm.minimax(gameBoard.gameBoardArr, false))
