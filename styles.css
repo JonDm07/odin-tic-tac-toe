@@ -8,7 +8,7 @@
     justify-content: center;
 }
 
-.game-board > .box {
+.game-board > .game-tile {
     border: solid black 1px;
     width: 100px;
     height: 100px;

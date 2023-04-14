@@ -16,64 +16,27 @@ const gameBoard = (() => {
             ]
     }
 
-    return {gameBoardArr, resetBoard}
+    const boxes = Array.from(document.querySelectorAll(".game-tile"))
+
+    // eslint-disable-next-line no-unused-vars
+    const tilesListener = (function() {
+        boxes.forEach(box => {
+            box.addEventListener("click", () => {
+                player1.play(box.getAttribute("data-row"), box.getAttribute("data-column"))
+                render()
+            })
+        })
+    })();
+
+    const render = function() {
+        boxes.forEach(box => {
+            box.textContent = gameBoard.gameBoardArr[box.getAttribute("data-row")][box.getAttribute("data-column")]
+        })
+    }
+
+    return {gameBoardArr, resetBoard, render}
 
 })();
-
-function player(symbol) {
-
-    function play(x, y) {
-
-        let winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
-
-        if(!winner) {
-
-            if (gameBoard.gameBoardArr[x][y] !== "O" && gameBoard.gameBoardArr[x][y] !== "X") {
-                gameBoard.gameBoardArr[x][y] = symbol
-                winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)            
-                emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
-
-                if(winner) {
-                    console.log(winner)
-                }
-
-                if(emptyCellsArray.length !== 0) {
-                    let aiMove = algorithm.minimax(gameBoard.gameBoardArr, false, emptyCellsArray)
-                
-                    let possibleMoves = emptyCellsArray.filter(el => el.score === aiMove)
-
-                    if(symbol === "X") {
-                        gameBoard.gameBoardArr[possibleMoves[0].row][possibleMoves[0].column] = "O"
-                        emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
-                        winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
-                        console.log(emptyCellsArray)
-
-                        if(winner) {
-                            console.log(winner)
-                        }
-                    } else {
-                        gameBoard.gameBoardArr[possibleMoves[0].row][possibleMoves[0].column] = "X"
-                        emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
-                        winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
-
-                        if(winner) {
-                            console.log(winner)
-                        }
-                    }
-                }
-
-                
-            }
-
-        } else {
-            console.log(winner)
-        }
-        console.log(gameBoard.gameBoardArr)
-    }  
-    return {symbol, play}
-}
-
-const player1 = Object.create(player("X"))
 
 const algorithm = (function() {
 
@@ -200,5 +163,64 @@ const algorithm = (function() {
     return {minimax, findEmptyCells, checkIfThereIsWinner}
 
 })()
+
+
+
+function player(symbol) {
+
+    let winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
+
+    function play(x, y) {
+
+        if(!winner && emptyCellsArray.length !== 0) {
+
+            if (gameBoard.gameBoardArr[x][y] !== "O" && gameBoard.gameBoardArr[x][y] !== "X") {
+                gameBoard.gameBoardArr[x][y] = symbol
+                winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)            
+                emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
+
+                if(winner) {
+                    console.log(winner)
+                }
+
+                if(emptyCellsArray.length !== 0) {
+                    let aiMove = algorithm.minimax(gameBoard.gameBoardArr, false, emptyCellsArray)
+                
+                    let possibleMoves = emptyCellsArray.filter(el => el.score === aiMove)
+
+                    if(symbol === "X") {
+                        gameBoard.gameBoardArr[possibleMoves[0].row][possibleMoves[0].column] = "O"
+                        emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
+                        winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
+                        console.log(emptyCellsArray)
+
+                        if(winner) {
+                            console.log(winner)
+                        }
+                    } else {
+                        gameBoard.gameBoardArr[possibleMoves[0].row][possibleMoves[0].column] = "X"
+                        emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
+                        winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
+
+                        if(winner) {
+                            console.log(winner)
+                        }
+                    }
+                }
+
+                
+            }
+
+        } else if(!winner && emptyCellsArray.length === 0) {
+            console.log("Draw")
+        } else {
+            console.log(winner)
+        }
+        console.log(gameBoard.gameBoardArr)
+    }  
+    return {symbol, winner, play}
+}
+
+const player1 = Object.create(player("X"))
 
 let emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
