@@ -1,8 +1,8 @@
 const gameBoard = (() => {
     let gameBoardArr = [
-        ["X","X","C"], 
-        ["O","O","C"],  
-        ["X","C","C"]   
+        ["C","C","C"],
+        ["C","C","C"],
+        ["C","C","C"]   
     ]
         
     
@@ -16,7 +16,6 @@ const gameBoard = (() => {
             ]
     }
 
-
     return {gameBoardArr, resetBoard}
 
 })();
@@ -24,65 +23,106 @@ const gameBoard = (() => {
 function player(symbol) {
 
     function play(x, y) {
-        if (gameBoard.gameBoardArr[x][y] !== "O" && gameBoard.gameBoardArr[x][y] !== "X") {
-            gameBoard.gameBoardArr[x][y] = symbol 
-        }
 
+        let winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
+
+        if(!winner) {
+
+            if (gameBoard.gameBoardArr[x][y] !== "O" && gameBoard.gameBoardArr[x][y] !== "X") {
+                gameBoard.gameBoardArr[x][y] = symbol
+                winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)            
+                emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
+
+                if(winner) {
+                    console.log(winner)
+                }
+
+                if(emptyCellsArray.length !== 0) {
+                    let aiMove = algorithm.minimax(gameBoard.gameBoardArr, false, emptyCellsArray)
+                
+                    let possibleMoves = emptyCellsArray.filter(el => el.score === aiMove)
+
+                    if(symbol === "X") {
+                        gameBoard.gameBoardArr[possibleMoves[0].row][possibleMoves[0].column] = "O"
+                        emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
+                        winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
+                        console.log(emptyCellsArray)
+
+                        if(winner) {
+                            console.log(winner)
+                        }
+                    } else {
+                        gameBoard.gameBoardArr[possibleMoves[0].row][possibleMoves[0].column] = "X"
+                        emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
+                        winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
+
+                        if(winner) {
+                            console.log(winner)
+                        }
+                    }
+                }
+
+                
+            }
+
+        } else {
+            console.log(winner)
+        }
         console.log(gameBoard.gameBoardArr)
     }  
     return {symbol, play}
 }
 
+const player1 = Object.create(player("X"))
+
 const algorithm = (function() {
 
-    const humanMark = "O"
-    const aiMark ="X"
-
-    const checkIfThereIsWinner = function(currentGameBoardState, mark) {
+    const checkIfThereIsWinner = function(currentGameBoardState) {
         let winner;
-
-        if(currentGameBoardState[1][1] === mark && currentGameBoardState[2][0] === mark &&  currentGameBoardState[0][2] === mark) {
-            winner = mark
-        } else if (currentGameBoardState[1][1] === mark && currentGameBoardState[0][0] === mark &&  currentGameBoardState[2][2] === mark) {
-            winner = mark
-        }
-
-        (function loopThroughBoard(mark) {
-            
-            let currentRowOrColumn = []
-
-            for(let i = 0; i < 3; i++) {
-
-                currentRowOrColumn = []
-
-                for(let j = 0; j < 3; j++) {
-                    if(currentGameBoardState[i][j] === mark) {
-                        currentRowOrColumn.push(currentGameBoardState[i][j])
-                    }
-                }
-
-                if(currentRowOrColumn.length === 3) {
-                    winner = mark
-                    break
-                }
-
-                currentRowOrColumn = []
-
-                for (let l = 0; l < 3; l++) {
-                    if(currentGameBoardState[l][i] === mark) {
-                        currentRowOrColumn.push(currentGameBoardState[l][i])
-                    }
-                }
-
-                if(currentRowOrColumn.length === 3) {
-                    winner = mark
-                    break
-                }
+        const mark = ["X", "O"]
+    
+        for(let i = 0; i < mark.length; i++) {
+            if(currentGameBoardState[1][1] === mark[i] && currentGameBoardState[2][0] === mark[i] &&  currentGameBoardState[0][2] === mark[i]) {
+                winner = mark[i]
+            } else if (currentGameBoardState[1][1] === mark[i] && currentGameBoardState[0][0] === mark[i] &&  currentGameBoardState[2][2] === mark[i]) {
+                winner = mark[i]
             }
-        })(mark);
-
-        return winner
         
+            (function loopThroughBoard(mark) {
+                
+                let currentRowOrColumn = []
+        
+                for(let i = 0; i < 3; i++) {
+        
+                    currentRowOrColumn = []
+        
+                    for(let j = 0; j < 3; j++) {
+                        if(currentGameBoardState[i][j] === mark) {
+                            currentRowOrColumn.push(currentGameBoardState[i][j])
+                        }
+                    }
+        
+                    if(currentRowOrColumn.length === 3) {
+                        winner = mark
+                        break
+                    }
+        
+                    currentRowOrColumn = []
+        
+                    for (let l = 0; l < 3; l++) {
+                        if(currentGameBoardState[l][i] === mark) {
+                            currentRowOrColumn.push(currentGameBoardState[l][i])
+                        }
+                    }
+        
+                    if(currentRowOrColumn.length === 3) {
+                        winner = mark
+                        break
+                    }
+                }
+            })(mark[i]);
+        }
+        return winner    
     }
 
     const findEmptyCells = function(currentGameBoardState) {
@@ -105,7 +145,9 @@ const algorithm = (function() {
     }
 
 
-    const minimax = (currentGameBoardState, maximizingPlayer) => {
+
+
+    const minimax = (currentGameBoardState, maximizingPlayer, emptyCellsArray) => {
         let mark;
 
         if(maximizingPlayer) {
@@ -113,18 +155,15 @@ const algorithm = (function() {
         } else {
             mark = "O"
         }
-        
-        let emptyCellsArray = findEmptyCells(currentGameBoardState)
 
-        
 
-        let humanCheck = checkIfThereIsWinner(currentGameBoardState, humanMark)
-        let aiCheck = checkIfThereIsWinner(currentGameBoardState, aiMark)
+        let winner = checkIfThereIsWinner(currentGameBoardState)
 
-        if(humanCheck !== undefined || aiCheck !== undefined || emptyCellsArray.length === 0) {
-            if(humanCheck) {
+
+        if(winner === "X" || winner === "O" || emptyCellsArray.length === 0) {
+            if(winner === "O") {
                 return -1
-            } else if(aiCheck) {
+            } else if(winner === "X") {
                 return 1 
             } else {
                 return 0
@@ -135,26 +174,31 @@ const algorithm = (function() {
                 for(let i = 0; i < emptyCellsArray.length; i++) {
                     let newGameBoard = JSON.parse(JSON.stringify(currentGameBoardState))
                     newGameBoard[emptyCellsArray[i].row][emptyCellsArray[i].column] = mark
-                    score.push(minimax(newGameBoard, false))
-                    
-
+                    let newEmptyCells = findEmptyCells(newGameBoard) 
+                    score.push(minimax(newGameBoard, false, newEmptyCells))
+                    emptyCellsArray[i].score = score[i]               
                 }
-                return Math.max.apply(Math, score)        
+
+
+                return Math.max.apply(Math, score)
+
             } else{
                 for(let i = 0; i < emptyCellsArray.length; i++) {
                     let newGameBoard = JSON.parse(JSON.stringify(currentGameBoardState))
                     newGameBoard[emptyCellsArray[i].row][emptyCellsArray[i].column] = mark
-                    score.push(minimax(newGameBoard, true))
-                    
-
+                    let newEmptyCells = findEmptyCells(newGameBoard)
+                    score.push(minimax(newGameBoard, true, newEmptyCells))
+                    emptyCellsArray[i].score = score[i]                    
                 }
-                return score
+                
+                return Math.min.apply(Math, score)
+
             }
         }        
     }
 
-    return {minimax}
+    return {minimax, findEmptyCells, checkIfThereIsWinner}
 
 })()
 
-console.log(algorithm.minimax(gameBoard.gameBoardArr, false))
+let emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
