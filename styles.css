@@ -1,11 +1,16 @@
+.container {
+    height: 100svh;
+    display: flex;
+    justify-content: center;
+}
 
 .game-board {
-    display: grid;
-    height: 100svh;
+    display: none;
     grid-template-columns: repeat(3, 100px);
     grid-template-rows: repeat(3, 100px);
-    align-content: center;
-    justify-content: center;
+    align-self: center;
+    width: 300px;
+    height: 300px;
 }
 
 .game-board > .game-tile {

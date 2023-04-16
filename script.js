@@ -5,18 +5,27 @@ const gameBoard = (() => {
         ["C","C","C"]   
     ]
         
-    
-
-    const resetBoard = function() {
-
-            gameBoard.gameBoardArr = [
-                ["C","C","C"],
-                ["C","C","C"],
-                ["C","C","C"]
-            ]
-    }
-
     const boxes = Array.from(document.querySelectorAll(".game-tile"))
+
+    const resetBoard = (function() {
+            const resetButton = document.querySelector(".reset")
+
+
+            resetButton.addEventListener("click", () => {
+                gameBoard.gameBoardArr = [
+                    ["C","C","C"],
+                    ["C","C","C"],
+                    ["C","C","C"]
+                ]
+
+                emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
+
+                boxes.forEach(box => {
+                    box.textContent = ""
+                })
+            })
+
+    })()
 
     // eslint-disable-next-line no-unused-vars
     const tilesListener = (function() {
@@ -30,13 +39,25 @@ const gameBoard = (() => {
 
     const render = function() {
         boxes.forEach(box => {
-            box.textContent = gameBoard.gameBoardArr[box.getAttribute("data-row")][box.getAttribute("data-column")]
+            if(gameBoard.gameBoardArr[box.getAttribute("data-row")][box.getAttribute("data-column")] === "X" || gameBoard.gameBoardArr[box.getAttribute("data-row")][box.getAttribute("data-column")] === "O") {
+                box.textContent = gameBoard.gameBoardArr[box.getAttribute("data-row")][box.getAttribute("data-column")]
+            }
         })
     }
+    
+    const startGame = (function() {
+        const startButton = document.querySelector(".start")
+        const gameGrid = document.querySelector(".game-board")
+
+        startButton.addEventListener("click", () => {
+            gameGrid.style.display = "grid"
+        })
+    })()
 
     return {gameBoardArr, resetBoard, render}
 
 })();
+
 
 const algorithm = (function() {
 
