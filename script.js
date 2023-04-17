@@ -44,19 +44,11 @@ const gameBoard = (() => {
             }
         })
     }
-    
-    const startGame = (function() {
-        const startButton = document.querySelector(".start")
-        const gameGrid = document.querySelector(".game-board")
-
-        startButton.addEventListener("click", () => {
-            gameGrid.style.display = "grid"
-        })
-    })()
 
     return {gameBoardArr, resetBoard, render}
 
 })();
+
 
 
 const algorithm = (function() {
@@ -205,7 +197,15 @@ function player(symbol) {
                 }
 
                 if(emptyCellsArray.length !== 0) {
-                    let aiMove = algorithm.minimax(gameBoard.gameBoardArr, false, emptyCellsArray)
+
+                    let aiMove;
+
+                    if(symbol === "X") {
+                        aiMove = algorithm.minimax(gameBoard.gameBoardArr, false, emptyCellsArray)
+                    } else if(symbol === "O") {
+                        aiMove = algorithm.minimax(gameBoard.gameBoardArr, true, emptyCellsArray)
+                    }
+
                 
                     let possibleMoves = emptyCellsArray.filter(el => el.score === aiMove)
 
@@ -216,7 +216,7 @@ function player(symbol) {
                         console.log(emptyCellsArray)
 
                         if(winner) {
-                            console.log(winner)
+                            alert(winner)
                         }
                     } else {
                         gameBoard.gameBoardArr[possibleMoves[0].row][possibleMoves[0].column] = "X"
@@ -224,7 +224,7 @@ function player(symbol) {
                         winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
 
                         if(winner) {
-                            console.log(winner)
+                            alert(winner)
                         }
                     }
                 }
@@ -238,10 +238,23 @@ function player(symbol) {
             console.log(winner)
         }
         console.log(gameBoard.gameBoardArr)
-    }  
+    }
+         
     return {symbol, winner, play}
 }
 
-const player1 = Object.create(player("X"))
-
 let emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
+
+const player1 = Object.create(player(prompt("Choose symbol: ")))
+
+if(player1.symbol === "O") {
+    let aiMove = algorithm.minimax(gameBoard.gameBoardArr, false, emptyCellsArray)
+    let possibleMoves = emptyCellsArray.filter(el => el.score === aiMove)
+    gameBoard.gameBoardArr[possibleMoves[0].row][possibleMoves[0].column] = "X"
+    gameBoard.render()
+    emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
+    player.winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
+    if(player.winner) {
+        alert(player.winner)
+    }
+}
