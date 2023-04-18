@@ -23,6 +23,8 @@ const gameBoard = (() => {
                 boxes.forEach(box => {
                     box.textContent = ""
                 })
+
+                player1.symbol = undefined
             })
 
     })()
@@ -48,8 +50,6 @@ const gameBoard = (() => {
     return {gameBoardArr, resetBoard, render}
 
 })();
-
-
 
 const algorithm = (function() {
 
@@ -179,16 +179,16 @@ const algorithm = (function() {
 
 
 
-function player(symbol) {
+function player() {
 
     let winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
 
-    function play(x, y) {
+    const play = function (x, y) {
 
         if(!winner && emptyCellsArray.length !== 0) {
 
             if (gameBoard.gameBoardArr[x][y] !== "O" && gameBoard.gameBoardArr[x][y] !== "X") {
-                gameBoard.gameBoardArr[x][y] = symbol
+                gameBoard.gameBoardArr[x][y] = this.symbol
                 winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)            
                 emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
 
@@ -200,16 +200,16 @@ function player(symbol) {
 
                     let aiMove;
 
-                    if(symbol === "X") {
+                    if(this.symbol === "X") {
                         aiMove = algorithm.minimax(gameBoard.gameBoardArr, false, emptyCellsArray)
-                    } else if(symbol === "O") {
+                    } else if(this.symbol === "O") {
                         aiMove = algorithm.minimax(gameBoard.gameBoardArr, true, emptyCellsArray)
                     }
 
                 
                     let possibleMoves = emptyCellsArray.filter(el => el.score === aiMove)
 
-                    if(symbol === "X") {
+                    if(this.symbol === "X") {
                         gameBoard.gameBoardArr[possibleMoves[0].row][possibleMoves[0].column] = "O"
                         emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
                         winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
@@ -240,21 +240,37 @@ function player(symbol) {
         console.log(gameBoard.gameBoardArr)
     }
          
-    return {symbol, winner, play}
+    return {winner, play}
 }
 
 let emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
 
-const player1 = Object.create(player(prompt("Choose symbol: ")))
+const player1 = Object.create(player())
 
-if(player1.symbol === "O") {
-    let aiMove = algorithm.minimax(gameBoard.gameBoardArr, false, emptyCellsArray)
-    let possibleMoves = emptyCellsArray.filter(el => el.score === aiMove)
-    gameBoard.gameBoardArr[possibleMoves[0].row][possibleMoves[0].column] = "X"
-    gameBoard.render()
-    emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
-    player.winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
-    if(player.winner) {
-        alert(player.winner)
-    }
-}
+const buttons = (function() {
+
+    const submitButton = document.querySelector("#submit")
+
+    submitButton.addEventListener("click", (e) => {
+        e.preventDefault()
+
+        const checkedRadioButton = document.querySelector("input[name='symbol']:checked").value
+        player1.symbol = checkedRadioButton
+
+        if(player1.symbol === "O") {
+            let aiMove = Math.floor(Math.random() * 10)
+        
+            gameBoard.gameBoardArr[emptyCellsArray[aiMove].row][emptyCellsArray[aiMove].column] = "X"
+            gameBoard.render()
+        
+            emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
+            player.winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
+        }
+
+    })
+
+    return{submitButton}
+})()
+
+console.log(buttons.submitButton)
+
