@@ -25,6 +25,7 @@ const gameBoard = (() => {
                 })
 
                 player1.symbol = undefined
+                buttons.form.style.display = "block"
             })
 
     })()
@@ -250,12 +251,15 @@ const player1 = Object.create(player())
 const buttons = (function() {
 
     const submitButton = document.querySelector("#submit")
+    const form = document.querySelector(".player-info")
 
     submitButton.addEventListener("click", (e) => {
         e.preventDefault()
 
-        const checkedRadioButton = document.querySelector("input[name='symbol']:checked").value
+        const checkedRadioButton = document.querySelector("input[name='symbol']:checked").value        
+
         player1.symbol = checkedRadioButton
+        form.style.display = "none"
 
         if(player1.symbol === "O") {
             let aiMove = Math.floor(Math.random() * 10)
@@ -269,8 +273,7 @@ const buttons = (function() {
 
     })
 
-    return{submitButton}
+    return{submitButton, form}
 })()
 
-console.log(buttons.submitButton)
 

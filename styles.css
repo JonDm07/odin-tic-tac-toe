@@ -1,11 +1,30 @@
+body {
+    background-image: url(img/paper-g96ec66588_1920.jpg);
+}
+
+body,
+html {
+    margin: 0px;
+    padding: 0px;
+}
+
+button:not(.game-tile) {
+    padding: 5px 15px;
+    border-radius: 10px;
+    border: none;
+}
+
 .container {
     height: 100svh;
     display: flex;
     flex-direction: row;
     justify-content: center;
+    align-items: center;
+    min-width: 370px;
 }
 
 .game-board {
+    margin-top: 50px;
     display: grid;
     grid-template-columns: repeat(3, 100px);
     grid-template-rows: repeat(3, 100px);
@@ -20,3 +39,8 @@
     height: 100px;
     text-align: center;
 }
+
+form  {
+    margin: auto;
+}
+
