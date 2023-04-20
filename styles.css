@@ -1,5 +1,6 @@
 body {
     background-image: url(img/paper-g96ec66588_1920.jpg);
+    background-size: cover;
 }
 
 body,
@@ -12,6 +13,13 @@ button:not(.game-tile) {
     padding: 5px 15px;
     border-radius: 10px;
     border: none;
+    min-width: 30px;
+    min-height: 15px;
+}
+
+.reset {
+    margin: 10px;
+
 }
 
 .container {
@@ -42,5 +50,9 @@ button:not(.game-tile) {
 
 form  {
     margin: auto;
+}
+
+form:first-child {
+    margin-left: 25%
 }
 

@@ -35,7 +35,10 @@ const gameBoard = (() => {
         boxes.forEach(box => {
             box.addEventListener("click", () => {
                 player1.play(box.getAttribute("data-row"), box.getAttribute("data-column"))
+                let winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
+                algorithm.alertWinner(winner)
                 render()
+
             })
         })
     })();
@@ -53,6 +56,14 @@ const gameBoard = (() => {
 })();
 
 const algorithm = (function() {
+
+    const alertWinner = function(x) {
+        if(x) {
+            alert(x)
+        } else if (!x && emptyCellsArray.length === 0) {
+            alert("Draw")
+        }
+    }
 
     const checkIfThereIsWinner = function(currentGameBoardState) {
         let winner;
@@ -174,7 +185,7 @@ const algorithm = (function() {
         }        
     }
 
-    return {minimax, findEmptyCells, checkIfThereIsWinner}
+    return {minimax, findEmptyCells, checkIfThereIsWinner, alertWinner}
 
 })()
 
@@ -234,9 +245,9 @@ function player() {
             }
 
         } else if(!winner && emptyCellsArray.length === 0) {
-            console.log("Draw")
+            alert("Draw")
         } else {
-            console.log(winner)
+            alert(winner)
         }
         console.log(gameBoard.gameBoardArr)
     }
