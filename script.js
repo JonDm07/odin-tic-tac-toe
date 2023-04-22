@@ -26,7 +26,8 @@ const gameBoard = (() => {
 
                 player1.symbol = undefined
                 buttons.form.style.display = "block"
-            })
+                render()
+            })    
 
     })()
 
@@ -45,8 +46,15 @@ const gameBoard = (() => {
 
     const render = function() {
         boxes.forEach(box => {
-            if(gameBoard.gameBoardArr[box.getAttribute("data-row")][box.getAttribute("data-column")] === "X" || gameBoard.gameBoardArr[box.getAttribute("data-row")][box.getAttribute("data-column")] === "O") {
-                box.textContent = gameBoard.gameBoardArr[box.getAttribute("data-row")][box.getAttribute("data-column")]
+            if(gameBoard.gameBoardArr[box.getAttribute("data-row")][box.getAttribute("data-column")] === "X") {
+                box.classList.add("button-close")
+            } else if(gameBoard.gameBoardArr[box.getAttribute("data-row")][box.getAttribute("data-column")] === "O") {
+                box.classList.add("button-circle")
+            }
+            
+            if(gameBoard.gameBoardArr[box.getAttribute("data-row")][box.getAttribute("data-column")] === "C") {
+                box.classList.remove("button-circle")
+                box.classList.remove("button-close")
             }
         })
     }
@@ -193,20 +201,16 @@ const algorithm = (function() {
 
 function player() {
 
-    let winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
-
     const play = function (x, y) {
+
+        let winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
 
         if(!winner && emptyCellsArray.length !== 0) {
 
             if (gameBoard.gameBoardArr[x][y] !== "O" && gameBoard.gameBoardArr[x][y] !== "X") {
                 gameBoard.gameBoardArr[x][y] = this.symbol
                 winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)            
-                emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
-
-                if(winner) {
-                    console.log(winner)
-                }
+                emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)               
 
                 if(emptyCellsArray.length !== 0) {
 
@@ -227,32 +231,18 @@ function player() {
                         winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
                         console.log(emptyCellsArray)
 
-                        if(winner) {
-                            alert(winner)
-                        }
+                        
                     } else {
                         gameBoard.gameBoardArr[possibleMoves[0].row][possibleMoves[0].column] = "X"
                         emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
                         winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
-
-                        if(winner) {
-                            alert(winner)
-                        }
                     }
-                }
-
-                
+                }                
             }
-
-        } else if(!winner && emptyCellsArray.length === 0) {
-            alert("Draw")
-        } else {
-            alert(winner)
         }
-        console.log(gameBoard.gameBoardArr)
     }
          
-    return {winner, play}
+    return {play}
 }
 
 let emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)

@@ -1,12 +1,23 @@
 body {
-    background-image: url(img/paper-g96ec66588_1920.jpg);
-    background-size: cover;
+/*     background-image: url(img/paper-g96ec66588_1920.jpg);
+    background-size: cover; */
+    background-color: #001021;
+    color: white;
 }
 
 body,
 html {
     margin: 0px;
     padding: 0px;
+    margin: 0;
+    height: 100%;
+    overflow: hidden
+}
+
+header {
+    width: 100%;
+    background-color: #5C80BC;
+    padding: 10px;
 }
 
 button:not(.game-tile) {
@@ -18,7 +29,7 @@ button:not(.game-tile) {
 }
 
 .reset {
-    margin: 10px;
+    margin: 15px;
 
 }
 
@@ -29,6 +40,10 @@ button:not(.game-tile) {
     justify-content: center;
     align-items: center;
     min-width: 370px;
+}
+
+.game-div {
+    position: absolute;
 }
 
 .game-board {
@@ -49,10 +64,23 @@ button:not(.game-tile) {
 }
 
 form  {
+    position: relative;
     margin: auto;
 }
 
 form:first-child {
     margin-left: 25%
+}
+
+.button-circle {
+    background-image: url("img/circle_FILL0_wght400_GRAD0_opsz48.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.button-close {
+    background-image: url("img/close_FILL0_wght400_GRAD0_opsz48.svg");
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
