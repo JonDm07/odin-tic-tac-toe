@@ -20,10 +20,6 @@ const gameBoard = (() => {
 
                 emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
 
-                boxes.forEach(box => {
-                    box.textContent = ""
-                })
-
                 player1.symbol = undefined
                 buttons.form.style.display = "block"
                 render()
@@ -35,11 +31,15 @@ const gameBoard = (() => {
     const tilesListener = (function() {
         boxes.forEach(box => {
             box.addEventListener("click", () => {
-                player1.play(box.getAttribute("data-row"), box.getAttribute("data-column"))
-                let winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
-                algorithm.alertWinner(winner)
-                render()
 
+                if(!player1.symbol) {
+                    alert("Choose symbol")
+                } else {
+                    player1.play(box.getAttribute("data-row"), box.getAttribute("data-column"))
+                    let winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
+                    algorithm.alertWinner(winner)
+                    render()
+                }
             })
         })
     })();
@@ -228,10 +228,7 @@ function player() {
                     if(this.symbol === "X") {
                         gameBoard.gameBoardArr[possibleMoves[0].row][possibleMoves[0].column] = "O"
                         emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
-                        winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
-                        console.log(emptyCellsArray)
-
-                        
+                        winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)                        
                     } else {
                         gameBoard.gameBoardArr[possibleMoves[0].row][possibleMoves[0].column] = "X"
                         emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
@@ -252,7 +249,11 @@ const player1 = Object.create(player())
 const buttons = (function() {
 
     const submitButton = document.querySelector("#submit")
+    const nextGameButton = document.querySelector(".next")
+    const changeNameButton = document.querySelector(".change-name")
+    const nameSubmitButton = document.querySelector("#name-submit")
     const form = document.querySelector(".player-info")
+    const nameForm = document.querySelector(".name-form")
 
     submitButton.addEventListener("click", (e) => {
         e.preventDefault()
@@ -271,6 +272,37 @@ const buttons = (function() {
             emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
             player.winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
         }
+
+    })
+
+    nextGameButton.addEventListener("click", () => {
+        gameBoard.gameBoardArr = [
+            ["C","C","C"],
+            ["C","C","C"],
+            ["C","C","C"]
+        ]
+
+        emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
+        gameBoard.render()
+    })
+
+    changeNameButton.addEventListener("click", () => {
+        if(nameForm.style.display === "block") {
+            nameForm.style.display = "none"
+        } else {
+            nameForm.style.display = "block"
+        }
+    })
+
+    nameSubmitButton.addEventListener("click", (e) => {
+        e.preventDefault()
+
+        const playerName = document.querySelector("#name").value
+
+        const playerNameSpan = document.querySelector(".header-right > span")
+        playerNameSpan.textContent= `Player name: ${playerName}`
+
+        nameForm.style.display = "none"
 
     })
 
