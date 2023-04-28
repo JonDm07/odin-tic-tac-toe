@@ -270,7 +270,6 @@ const buttons = (function() {
             gameBoard.render()
         
             emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
-            player.winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
         }
 
     })
@@ -283,7 +282,15 @@ const buttons = (function() {
         ]
 
         emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
-        gameBoard.render()
+
+        if(player1.symbol === "O") {
+            let aiMove = Math.floor(Math.random() * 10)
+        
+            gameBoard.gameBoardArr[emptyCellsArray[aiMove].row][emptyCellsArray[aiMove].column] = "X"
+            gameBoard.render()
+        
+            emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
+        }
     })
 
     changeNameButton.addEventListener("click", () => {
