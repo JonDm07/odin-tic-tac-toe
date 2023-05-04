@@ -1,319 +1,339 @@
 const gameBoard = (() => {
-    let gameBoardArr = [
-        ["C","C","C"],
-        ["C","C","C"],
-        ["C","C","C"]   
-    ]
-        
-    const boxes = Array.from(document.querySelectorAll(".game-tile"))
+  let gameBoardArr = [
+    ["C", "C", "C"],
+    ["C", "C", "C"],
+    ["C", "C", "C"],
+  ];
 
-    const resetBoard = (function() {
-            const resetButton = document.querySelector(".reset")
+  const boxes = Array.from(document.querySelectorAll(".game-tile"));
 
+  const resetBoard = (function () {
+    const resetButton = document.querySelector(".reset");
 
-            resetButton.addEventListener("click", () => {
-                gameBoard.gameBoardArr = [
-                    ["C","C","C"],
-                    ["C","C","C"],
-                    ["C","C","C"]
-                ]
+    resetButton.addEventListener("click", () => {
+      gameBoard.gameBoardArr = [
+        ["C", "C", "C"],
+        ["C", "C", "C"],
+        ["C", "C", "C"],
+      ];
 
-                emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
+      emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr);
 
-                player1.symbol = undefined
-                buttons.form.style.display = "block"
-                render()
-            })    
+      player1.symbol = undefined;
+      buttons.form.style.display = "block";
+      render();
+    });
+  })();
 
-    })()
+  // eslint-disable-next-line no-unused-vars
+  const tilesListener = (function () {
+    boxes.forEach((box) => {
+      box.addEventListener("click", () => {
+        if (!player1.symbol) {
+          alert("Choose symbol");
+        } else {
+          player1.play(
+            box.getAttribute("data-row"),
+            box.getAttribute("data-column")
+          );
+          let winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr);
+          algorithm.alertWinner(winner);
+          render();
+        }
+      });
+    });
+  })();
 
-    // eslint-disable-next-line no-unused-vars
-    const tilesListener = (function() {
-        boxes.forEach(box => {
-            box.addEventListener("click", () => {
+  const render = function () {
+    boxes.forEach((box) => {
+      if (
+        gameBoard.gameBoardArr[box.getAttribute("data-row")][
+          box.getAttribute("data-column")
+        ] === "X"
+      ) {
+        box.classList.add("button-close");
+      } else if (
+        gameBoard.gameBoardArr[box.getAttribute("data-row")][
+          box.getAttribute("data-column")
+        ] === "O"
+      ) {
+        box.classList.add("button-circle");
+      }
 
-                if(!player1.symbol) {
-                    alert("Choose symbol")
-                } else {
-                    player1.play(box.getAttribute("data-row"), box.getAttribute("data-column"))
-                    let winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
-                    algorithm.alertWinner(winner)
-                    render()
-                }
-            })
-        })
-    })();
+      if (
+        gameBoard.gameBoardArr[box.getAttribute("data-row")][
+          box.getAttribute("data-column")
+        ] === "C"
+      ) {
+        box.classList.remove("button-circle");
+        box.classList.remove("button-close");
+      }
+    });
+  };
 
-    const render = function() {
-        boxes.forEach(box => {
-            if(gameBoard.gameBoardArr[box.getAttribute("data-row")][box.getAttribute("data-column")] === "X") {
-                box.classList.add("button-close")
-            } else if(gameBoard.gameBoardArr[box.getAttribute("data-row")][box.getAttribute("data-column")] === "O") {
-                box.classList.add("button-circle")
-            }
-            
-            if(gameBoard.gameBoardArr[box.getAttribute("data-row")][box.getAttribute("data-column")] === "C") {
-                box.classList.remove("button-circle")
-                box.classList.remove("button-close")
-            }
-        })
-    }
-
-    return {gameBoardArr, resetBoard, render}
-
+  return { gameBoardArr, resetBoard, render };
 })();
 
-const algorithm = (function() {
+const algorithm = (function () {
+  const alertWinner = function (x) {
+    if (x) {
+      alert(x);
+    } else if (!x && emptyCellsArray.length === 0) {
+      alert("Draw");
+    }
+  };
 
-    const alertWinner = function(x) {
-        if(x) {
-            alert(x)
-        } else if (!x && emptyCellsArray.length === 0) {
-            alert("Draw")
+  const checkIfThereIsWinner = function (currentGameBoardState) {
+    let winner;
+    const mark = ["X", "O"];
+
+    for (let i = 0; i < mark.length; i++) {
+      if (
+        currentGameBoardState[1][1] === mark[i] &&
+        currentGameBoardState[2][0] === mark[i] &&
+        currentGameBoardState[0][2] === mark[i]
+      ) {
+        winner = mark[i];
+      } else if (
+        currentGameBoardState[1][1] === mark[i] &&
+        currentGameBoardState[0][0] === mark[i] &&
+        currentGameBoardState[2][2] === mark[i]
+      ) {
+        winner = mark[i];
+      }
+
+      (function loopThroughBoard(mark) {
+        let currentRowOrColumn = [];
+
+        for (let i = 0; i < 3; i++) {
+          currentRowOrColumn = [];
+
+          for (let j = 0; j < 3; j++) {
+            if (currentGameBoardState[i][j] === mark) {
+              currentRowOrColumn.push(currentGameBoardState[i][j]);
+            }
+          }
+
+          if (currentRowOrColumn.length === 3) {
+            winner = mark;
+            break;
+          }
+
+          currentRowOrColumn = [];
+
+          for (let l = 0; l < 3; l++) {
+            if (currentGameBoardState[l][i] === mark) {
+              currentRowOrColumn.push(currentGameBoardState[l][i]);
+            }
+          }
+
+          if (currentRowOrColumn.length === 3) {
+            winner = mark;
+            break;
+          }
         }
+      })(mark[i]);
+    }
+    return winner;
+  };
+
+  const findEmptyCells = function (currentGameBoardState) {
+    let emptyCellsArray = [];
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (currentGameBoardState[i][j] === "C") {
+          let emptyCell = {
+            row: i,
+            column: j,
+            score: undefined,
+          };
+
+          emptyCellsArray.push(emptyCell);
+        }
+      }
     }
 
-    const checkIfThereIsWinner = function(currentGameBoardState) {
-        let winner;
-        const mark = ["X", "O"]
-    
-        for(let i = 0; i < mark.length; i++) {
-            if(currentGameBoardState[1][1] === mark[i] && currentGameBoardState[2][0] === mark[i] &&  currentGameBoardState[0][2] === mark[i]) {
-                winner = mark[i]
-            } else if (currentGameBoardState[1][1] === mark[i] && currentGameBoardState[0][0] === mark[i] &&  currentGameBoardState[2][2] === mark[i]) {
-                winner = mark[i]
-            }
-        
-            (function loopThroughBoard(mark) {
-                
-                let currentRowOrColumn = []
-        
-                for(let i = 0; i < 3; i++) {
-        
-                    currentRowOrColumn = []
-        
-                    for(let j = 0; j < 3; j++) {
-                        if(currentGameBoardState[i][j] === mark) {
-                            currentRowOrColumn.push(currentGameBoardState[i][j])
-                        }
-                    }
-        
-                    if(currentRowOrColumn.length === 3) {
-                        winner = mark
-                        break
-                    }
-        
-                    currentRowOrColumn = []
-        
-                    for (let l = 0; l < 3; l++) {
-                        if(currentGameBoardState[l][i] === mark) {
-                            currentRowOrColumn.push(currentGameBoardState[l][i])
-                        }
-                    }
-        
-                    if(currentRowOrColumn.length === 3) {
-                        winner = mark
-                        break
-                    }
-                }
-            })(mark[i]);
-        }
-        return winner    
+    return emptyCellsArray;
+  };
+
+  const minimax = (
+    currentGameBoardState,
+    maximizingPlayer,
+    emptyCellsArray
+  ) => {
+    let mark;
+
+    if (maximizingPlayer) {
+      mark = "X";
+    } else {
+      mark = "O";
     }
 
-    const findEmptyCells = function(currentGameBoardState) {
-        let emptyCellsArray = []
-        for(let i = 0; i < 3; i++){
-            for(let j = 0; j <3; j++) {
-                if(currentGameBoardState[i][j] === "C") {
-                    let emptyCell = {
-                        row: i,
-                        column: j,
-                        score: undefined
-                    }
+    let winner = checkIfThereIsWinner(currentGameBoardState);
 
-                    emptyCellsArray.push(emptyCell)
-                }          
-            }
+    if (winner === "X" || winner === "O" || emptyCellsArray.length === 0) {
+      if (winner === "O") {
+        return -1;
+      } else if (winner === "X") {
+        return 1;
+      } else {
+        return 0;
+      }
+    } else {
+      let score = [];
+      if (maximizingPlayer) {
+        for (let i = 0; i < emptyCellsArray.length; i++) {
+          let newGameBoard = JSON.parse(JSON.stringify(currentGameBoardState));
+          newGameBoard[emptyCellsArray[i].row][emptyCellsArray[i].column] =
+            mark;
+          let newEmptyCells = findEmptyCells(newGameBoard);
+          score.push(minimax(newGameBoard, false, newEmptyCells));
+          emptyCellsArray[i].score = score[i];
         }
 
-        return emptyCellsArray
-    }
-
-
-
-
-    const minimax = (currentGameBoardState, maximizingPlayer, emptyCellsArray) => {
-        let mark;
-
-        if(maximizingPlayer) {
-            mark = "X"
-        } else {
-            mark = "O"
+        return Math.max.apply(Math, score);
+      } else {
+        for (let i = 0; i < emptyCellsArray.length; i++) {
+          let newGameBoard = JSON.parse(JSON.stringify(currentGameBoardState));
+          newGameBoard[emptyCellsArray[i].row][emptyCellsArray[i].column] =
+            mark;
+          let newEmptyCells = findEmptyCells(newGameBoard);
+          score.push(minimax(newGameBoard, true, newEmptyCells));
+          emptyCellsArray[i].score = score[i];
         }
 
-
-        let winner = checkIfThereIsWinner(currentGameBoardState)
-
-
-        if(winner === "X" || winner === "O" || emptyCellsArray.length === 0) {
-            if(winner === "O") {
-                return -1
-            } else if(winner === "X") {
-                return 1 
-            } else {
-                return 0
-            }
-        } else {
-            let score = []
-            if(maximizingPlayer) {
-                for(let i = 0; i < emptyCellsArray.length; i++) {
-                    let newGameBoard = JSON.parse(JSON.stringify(currentGameBoardState))
-                    newGameBoard[emptyCellsArray[i].row][emptyCellsArray[i].column] = mark
-                    let newEmptyCells = findEmptyCells(newGameBoard) 
-                    score.push(minimax(newGameBoard, false, newEmptyCells))
-                    emptyCellsArray[i].score = score[i]               
-                }
-
-
-                return Math.max.apply(Math, score)
-
-            } else{
-                for(let i = 0; i < emptyCellsArray.length; i++) {
-                    let newGameBoard = JSON.parse(JSON.stringify(currentGameBoardState))
-                    newGameBoard[emptyCellsArray[i].row][emptyCellsArray[i].column] = mark
-                    let newEmptyCells = findEmptyCells(newGameBoard)
-                    score.push(minimax(newGameBoard, true, newEmptyCells))
-                    emptyCellsArray[i].score = score[i]                    
-                }
-                
-                return Math.min.apply(Math, score)
-
-            }
-        }        
+        return Math.min.apply(Math, score);
+      }
     }
+  };
 
-    return {minimax, findEmptyCells, checkIfThereIsWinner, alertWinner}
-
-})()
-
-
+  return { minimax, findEmptyCells, checkIfThereIsWinner, alertWinner };
+})();
 
 function player() {
+  const play = function (x, y) {
+    let winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr);
 
-    const play = function (x, y) {
+    if (!winner && emptyCellsArray.length !== 0) {
+      if (
+        gameBoard.gameBoardArr[x][y] !== "O" &&
+        gameBoard.gameBoardArr[x][y] !== "X"
+      ) {
+        gameBoard.gameBoardArr[x][y] = this.symbol;
+        winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr);
+        emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr);
 
-        let winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
+        if (emptyCellsArray.length !== 0) {
+          let aiMove;
 
-        if(!winner && emptyCellsArray.length !== 0) {
+          if (this.symbol === "X") {
+            aiMove = algorithm.minimax(
+              gameBoard.gameBoardArr,
+              false,
+              emptyCellsArray
+            );
+          } else if (this.symbol === "O") {
+            aiMove = algorithm.minimax(
+              gameBoard.gameBoardArr,
+              true,
+              emptyCellsArray
+            );
+          }
 
-            if (gameBoard.gameBoardArr[x][y] !== "O" && gameBoard.gameBoardArr[x][y] !== "X") {
-                gameBoard.gameBoardArr[x][y] = this.symbol
-                winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)            
-                emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)               
+          let possibleMoves = emptyCellsArray.filter(
+            (el) => el.score === aiMove
+          );
 
-                if(emptyCellsArray.length !== 0) {
-
-                    let aiMove;
-
-                    if(this.symbol === "X") {
-                        aiMove = algorithm.minimax(gameBoard.gameBoardArr, false, emptyCellsArray)
-                    } else if(this.symbol === "O") {
-                        aiMove = algorithm.minimax(gameBoard.gameBoardArr, true, emptyCellsArray)
-                    }
-
-                
-                    let possibleMoves = emptyCellsArray.filter(el => el.score === aiMove)
-
-                    if(this.symbol === "X") {
-                        gameBoard.gameBoardArr[possibleMoves[0].row][possibleMoves[0].column] = "O"
-                        emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
-                        winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)                        
-                    } else {
-                        gameBoard.gameBoardArr[possibleMoves[0].row][possibleMoves[0].column] = "X"
-                        emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
-                        winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr)
-                    }
-                }                
-            }
+          if (this.symbol === "X") {
+            gameBoard.gameBoardArr[possibleMoves[0].row][
+              possibleMoves[0].column
+            ] = "O";
+            emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr);
+            winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr);
+          } else {
+            gameBoard.gameBoardArr[possibleMoves[0].row][
+              possibleMoves[0].column
+            ] = "X";
+            emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr);
+            winner = algorithm.checkIfThereIsWinner(gameBoard.gameBoardArr);
+          }
         }
+      }
     }
-         
-    return {play}
+  };
+
+  const randomFirstMove = function () {
+    if (player1.symbol === "O") {
+      let aiMove = Math.floor(Math.random() * 10);
+
+      gameBoard.gameBoardArr[emptyCellsArray[aiMove].row][
+        emptyCellsArray[aiMove].column
+      ] = "X";
+      gameBoard.render();
+
+      emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr);
+    }
+  };
+
+  return { play, randomFirstMove };
 }
 
-let emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
+let emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr);
 
-const player1 = Object.create(player())
+const player1 = Object.create(player());
 
-const buttons = (function() {
+const buttons = (function () {
+  const submitButton = document.querySelector("#submit");
+  const nextGameButton = document.querySelector(".next");
+  const changeNameButton = document.querySelector(".change-name");
+  const nameSubmitButton = document.querySelector("#name-submit");
+  const form = document.querySelector(".player-info");
+  const nameForm = document.querySelector(".name-form");
 
-    const submitButton = document.querySelector("#submit")
-    const nextGameButton = document.querySelector(".next")
-    const changeNameButton = document.querySelector(".change-name")
-    const nameSubmitButton = document.querySelector("#name-submit")
-    const form = document.querySelector(".player-info")
-    const nameForm = document.querySelector(".name-form")
+  submitButton.addEventListener("click", (e) => {
+    e.preventDefault();
 
-    submitButton.addEventListener("click", (e) => {
-        e.preventDefault()
+    const checkedRadioButton = document.querySelector(
+      "input[name='symbol']:checked"
+    ).value;
 
-        const checkedRadioButton = document.querySelector("input[name='symbol']:checked").value        
+    player1.symbol = checkedRadioButton;
+    form.style.display = "none";
 
-        player1.symbol = checkedRadioButton
-        form.style.display = "none"
+    player1.randomFirstMove();
+  });
 
-        if(player1.symbol === "O") {
-            let aiMove = Math.floor(Math.random() * 10)
-        
-            gameBoard.gameBoardArr[emptyCellsArray[aiMove].row][emptyCellsArray[aiMove].column] = "X"
-            gameBoard.render()
-        
-            emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
-        }
+  nextGameButton.addEventListener("click", () => {
+    gameBoard.gameBoardArr = [
+      ["C", "C", "C"],
+      ["C", "C", "C"],
+      ["C", "C", "C"],
+    ];
 
-    })
+    emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr);
 
-    nextGameButton.addEventListener("click", () => {
-        gameBoard.gameBoardArr = [
-            ["C","C","C"],
-            ["C","C","C"],
-            ["C","C","C"]
-        ]
+    gameBoard.render();
+    player1.randomFirstMove();
+  });
 
-        emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
+  changeNameButton.addEventListener("click", () => {
+    if (nameForm.style.display === "block") {
+      nameForm.style.display = "none";
+    } else {
+      nameForm.style.display = "block";
+    }
+  });
 
-        if(player1.symbol === "O") {
-            let aiMove = Math.floor(Math.random() * 10)
-        
-            gameBoard.gameBoardArr[emptyCellsArray[aiMove].row][emptyCellsArray[aiMove].column] = "X"
-            gameBoard.render()
-        
-            emptyCellsArray = algorithm.findEmptyCells(gameBoard.gameBoardArr)
-        }
-    })
+  nameSubmitButton.addEventListener("click", (e) => {
+    e.preventDefault();
 
-    changeNameButton.addEventListener("click", () => {
-        if(nameForm.style.display === "block") {
-            nameForm.style.display = "none"
-        } else {
-            nameForm.style.display = "block"
-        }
-    })
+    const playerName = document.querySelector("#name").value;
 
-    nameSubmitButton.addEventListener("click", (e) => {
-        e.preventDefault()
+    const playerNameSpan = document.querySelector(".header-right > span");
+    playerNameSpan.textContent = `Player name: ${playerName}`;
 
-        const playerName = document.querySelector("#name").value
+    nameForm.style.display = "none";
+  });
 
-        const playerNameSpan = document.querySelector(".header-right > span")
-        playerNameSpan.textContent= `Player name: ${playerName}`
-
-        nameForm.style.display = "none"
-
-    })
-
-    return{submitButton, form}
-})()
-
-
+  return { submitButton, form };
+})();
